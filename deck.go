@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/fs"
+	"log"
 	"os"
 	"strings"
 )
@@ -40,4 +41,18 @@ func (d deck) saveToFile(filename string) error {
 
 func deal(d deck, handSize int) (deck, deck) {
 	return d[:handSize], d[handSize:]
+}
+
+func newDeckFromFile(filename string) deck {
+	fileContent, err := os.ReadFile(filename)
+
+	if err != nil {
+		log.Print(err.Error())
+        log.Print("Creating a new deck from scratch...")
+		return newDeck()
+	}
+
+	s := strings.Split(string(fileContent), ", ")
+
+	return deck(s)
 }
