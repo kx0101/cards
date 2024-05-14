@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 type deck []string
@@ -27,7 +29,7 @@ func newDeck() deck {
 
 func (d deck) print() {
 	for i, card := range d {
-		fmt.Println(i, card)
+		fmt.Println(i + 1, card)
 	}
 }
 
@@ -39,6 +41,19 @@ func (d deck) saveToFile(filename string) error {
 	return os.WriteFile(filename, []byte(d.toString()), fs.FileMode(0666))
 }
 
+func (d deck) shuffle() deck {
+	source := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(source)
+
+	for i := range d {
+		newPosition := r.Intn(len(d) - 1)
+
+		d[i], d[newPosition] = d[newPosition], d[i]
+	}
+
+	return d
+}
+
 func deal(d deck, handSize int) (deck, deck) {
 	return d[:handSize], d[handSize:]
 }
@@ -48,7 +63,7 @@ func newDeckFromFile(filename string) deck {
 
 	if err != nil {
 		log.Print(err.Error())
-        log.Print("Creating a new deck from scratch...")
+		log.Print("Creating a new deck from scratch...")
 		return newDeck()
 	}
 
